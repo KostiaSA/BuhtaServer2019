@@ -15,7 +15,10 @@ namespace BuhtaServer.test
             Console.WriteLine("-------- начинаем ------------");
 
             var objStr = @"
+
 {
+  ""createdDate"": ""<Date>2017-09-25 11:03:45.046"",
+  ""createdDateTime"": ""<DateTime>0001-09-26 11:03:45.046"",
   ""arr"":[1,""жо'па"",null,567], 
   ""bol1"":true, 
   ""bol0"":false, 

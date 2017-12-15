@@ -14,7 +14,6 @@ namespace BuhtaServer
     {
         static ConcurrentDictionary<string, Func<object, string>> CompiledTemplates = new ConcurrentDictionary<string, Func<object, string>>();
 
-
         static JToken escapeSql(string dialect, JToken obj)
         {
             switch (obj.Type)
@@ -42,17 +41,57 @@ namespace BuhtaServer
                     return obj.ToString().Replace(",", ".");
 
                 case JTokenType.String:
-                    if (dialect == "mssql")
-                        return "'" + ((string)obj).Replace("'", "''") + "'";
-                    else
-                    if (dialect == "postgres")
-                        return "'" + ((string)obj).Replace("\0", "").Replace("'", "''") + "'";
-                    else
-                    if (dialect == "mysql")
-                        return "'" + MySql.Data.MySqlClient.MySqlHelper.EscapeString((string)obj) + "'";
-                    else
-                        throw new Exception("invalid dialect: " + dialect);
+                    var str = (string)obj;
+                    if (str.StartsWith("<Date>"))
+                    {
+                        var dateStr = str.Substring("<Date>".Length);
+                        var date = DateTime.Parse(dateStr);
+                        if (dialect == "mssql")
+                            return "CONVERT(DATE,'" + date.ToString("yyyyMMdd") + "')";
+                        else
+                        if (dialect == "postgres")
+                            return "TIMESTAMP(3)'" + date.ToString("yyyy-MM-dd") + "'";
+                        else
+                        if (dialect == "mysql")
+                            // timezone не воспринимает
+                            return "STR_TO_DATE('" + date.ToString("yyyy-MM-dd") + "','%Y-%c-%d')";
+                        else
+                            throw new Exception("invalid dialect: " + dialect);
 
+                    }
+                    else
+                    if (str.StartsWith("<DateTime>"))
+                    {
+                        var dateStr = str.Substring("<DateTime>".Length);
+                        var date = DateTime.Parse(dateStr);
+                        if (dialect == "mssql")
+                            return "CONVERT(DATETIME2,'" + date.ToString("yyyyMMdd HH:mm:ss.FFF") + "')";
+                        else
+                        if (dialect == "postgres")
+                            return "TIMESTAMP(3)'" + date.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "'";
+                        else
+                        if (dialect == "mysql")
+                            // timezone не воспринимает
+                            return "STR_TO_DATE('" + date.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "','%Y-%c-%d %k:%i:%s.%f')";
+                        else
+                            throw new Exception("invalid dialect: " + dialect);
+
+                    }
+                    .guid
+                    else
+                    {
+
+                        if (dialect == "mssql")
+                            return "'" + str.Replace("'", "''") + "'";
+                        else
+                        if (dialect == "postgres")
+                            return "'" + str.Replace("\0", "").Replace("'", "''") + "'";
+                        else
+                        if (dialect == "mysql")
+                            return "'" + MySql.Data.MySqlClient.MySqlHelper.EscapeString(str) + "'";
+                        else
+                            throw new Exception("invalid dialect: " + dialect);
+                    }
                 case JTokenType.Boolean:
                     if (dialect == "mssql")
                         return (bool)obj ? "1" : "0";
