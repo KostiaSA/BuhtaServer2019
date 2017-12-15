@@ -1,0 +1,30 @@
+﻿{
+	"qqq": "222",
+	"databases": [
+		{
+			"name": "main",
+			"dialect": "mssql",
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;"
+		},
+		{
+			"name": "testmssql",
+			"dialect": "mssql",
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;"
+		},
+		{
+			"name": "testpostgres",
+			"dialect": "postgres",
+			"connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk2128506;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;"
+		},
+		{
+			"name": "testmysql",
+			"dialect": "mysql",
+			"connectionString": "User ID=root;Password=sonyk2128506;Host=192.168.0.70;Port=3306;Database=buhta2018_test;"
+		},
+		{
+			"name": "mag3666",
+			"dialect": "mssql",
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=MAG3666;"
+		}
+	]
+}
