@@ -21,8 +21,8 @@ namespace BuhtaServer
 
         public static void Main(string[] args)
         {
-            TestHandlebars.test1();
-            //BuildWebHost(args).Run();
+            //TestHandlebars.test1();
+            BuildWebHost(args).Run();
         }
 
         public static IWebHost BuildWebHost(string[] args)

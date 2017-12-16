@@ -42,90 +42,95 @@ namespace BuhtaServer
 
                 case JTokenType.String:
                     var str = (string)obj;
-                    if (str.StartsWith("<Date>"))
+                    if (str.StartsWith("<"))
                     {
-                        var dateStr = str.Substring("<Date>".Length);
-                        var date = DateTime.Parse(dateStr);
-                        if (dialect == "mssql")
-                            return "CONVERT(DATE,'" + date.ToString("yyyyMMdd") + "')";
-                        else
-                        if (dialect == "postgres")
-                            return "TIMESTAMP(3)'" + date.ToString("yyyy-MM-dd") + "'";
-                        else
-                        if (dialect == "mysql")
-                            // timezone не воспринимает
-                            return "STR_TO_DATE('" + date.ToString("yyyy-MM-dd") + "','%Y-%c-%d')";
-                        else
-                            throw new Exception("invalid dialect: " + dialect);
+                        if (str.StartsWith("<Date>"))
+                        {
+                            var dateStr = str.Substring("<Date>".Length);
+                            var date = DateTime.Parse(dateStr);
+                            if (dialect == "mssql")
+                                return "CONVERT(DATE,'" + date.ToString("yyyyMMdd") + "')";
+                            else
+                            if (dialect == "postgres")
+                                return "TIMESTAMP(3)'" + date.ToString("yyyy-MM-dd") + "'";
+                            else
+                            if (dialect == "mysql")
+                                // timezone не воспринимает
+                                return "STR_TO_DATE('" + date.ToString("yyyy-MM-dd") + "','%Y-%c-%d')";
+                            else
+                                throw new Exception("invalid dialect: " + dialect);
 
+                        }
+                        else
+                        if (str.StartsWith("<DateTime>"))
+                        {
+                            var dateStr = str.Substring("<DateTime>".Length);
+                            var date = DateTime.Parse(dateStr);
+                            if (dialect == "mssql")
+                                return "CONVERT(DATETIME2,'" + date.ToString("yyyyMMdd HH:mm:ss.FFF") + "')";
+                            else
+                            if (dialect == "postgres")
+                                return "TIMESTAMP(3)'" + date.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "'";
+                            else
+                            if (dialect == "mysql")
+                                // timezone не воспринимает
+                                return "STR_TO_DATE('" + date.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "','%Y-%c-%d %k:%i:%s.%f')";
+                            else
+                                throw new Exception("invalid dialect: " + dialect);
+
+                        }
+                        else // 
+                        if (str.StartsWith("<Guid>"))
+                        {
+                            var guidStr = str.Substring("<Guid>".Length);
+                            var guid = Guid.Parse(guidStr);
+                            if (dialect == "mssql")
+                                return "CONVERT(UNIQUEIDENTIFIER,'" + guid.ToString() + "')";
+                            else
+                            if (dialect == "postgres")
+                                return "UUID '" + guid.ToString() + "'";
+                            else
+                            if (dialect == "mysql")
+                                return "convert(0x" + BitConverter.ToString(guid.ToByteArray()).Replace("-", "") + ",binary(16))";
+                            else
+                                throw new Exception("invalid dialect: " + dialect);
+                        }
+                        else
+                        if (str.StartsWith("<Uint8Array>") || str.StartsWith("<ArrayBuffer>"))
+                        {
+                            string base64;
+                            if (str.StartsWith("<Uint8Array>"))
+                                base64 = str.Substring("<Uint8Array>".Length);
+                            else
+                                base64 = str.Substring("<ArrayBuffer>".Length);
+                            var hexStr = BitConverter.ToString(Convert.FromBase64String(base64)).Replace("-", "");
+
+                            if (dialect == "mssql")
+                                return "0x" + hexStr;
+                            else if (dialect == "postgres")
+                                return "E'\\\\x" + hexStr + "'";
+                            else if (dialect == "mysql")
+                                return "convert(X'" + hexStr + "',binary)";
+                            else
+                                throw new Exception("invalid dialect: " + dialect);
+                        }
+                        else
+                        {
+                            str = str.Substring(1);
+                        }
                     }
+
+                    if (dialect == "mssql")
+                        return "'" + str.Replace("'", "''") + "'";
                     else
-                    if (str.StartsWith("<DateTime>"))
-                    {
-                        var dateStr = str.Substring("<DateTime>".Length);
-                        var date = DateTime.Parse(dateStr);
-                        if (dialect == "mssql")
-                            return "CONVERT(DATETIME2,'" + date.ToString("yyyyMMdd HH:mm:ss.FFF") + "')";
-                        else
-                        if (dialect == "postgres")
-                            return "TIMESTAMP(3)'" + date.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "'";
-                        else
-                        if (dialect == "mysql")
-                            // timezone не воспринимает
-                            return "STR_TO_DATE('" + date.ToString("yyyy-MM-dd HH:mm:ss.FFF") + "','%Y-%c-%d %k:%i:%s.%f')";
-                        else
-                            throw new Exception("invalid dialect: " + dialect);
-
-                    }
-                    else // 
-                    if (str.StartsWith("<Guid>"))
-                    {
-                        var guidStr = str.Substring("<Guid>".Length);
-                        var guid = Guid.Parse(guidStr);
-                        if (dialect == "mssql")
-                            return "CONVERT(UNIQUEIDENTIFIER,'" + guid.ToString() + "')";
-                        else
-                        if (dialect == "postgres")
-                            return "UUID '" + guid.ToString() + "'";
-                        else
-                        if (dialect == "mysql")
-                            return "convert(0x" + BitConverter.ToString(guid.ToByteArray()).Replace("-", "") + ",binary(16))";
-                        else
-                            throw new Exception("invalid dialect: " + dialect);
-                    }
+                    if (dialect == "postgres")
+                        return "'" + str.Replace("\0", "").Replace("'", "''") + "'";
                     else
-                    if (str.StartsWith("<Uint8Array>") || str.StartsWith("<ArrayBuffer>"))
-                    {
-                        string base64;
-                        if (str.StartsWith("<Uint8Array>"))
-                            base64 = str.Substring("<Uint8Array>".Length);
-                        else
-                            base64 = str.Substring("<ArrayBuffer>".Length);
-                        var hexStr = BitConverter.ToString(Convert.FromBase64String(base64)).Replace("-", "");
-
-                        if (dialect == "mssql")
-                            return "0x" + hexStr;
-                        else if (dialect == "postgres")
-                            return "E'\\\\x" + hexStr + "'";
-                        else if (dialect == "mysql")
-                            return "convert(X'" + hexStr + "',binary)";
-                        else
-                            throw new Exception("invalid dialect: " + dialect);
-                    }
+                    if (dialect == "mysql")
+                        return "'" + MySql.Data.MySqlClient.MySqlHelper.EscapeString(str) + "'";
                     else
-                    {
+                        throw new Exception("invalid dialect: " + dialect);
 
-                        if (dialect == "mssql")
-                            return "'" + str.Replace("'", "''") + "'";
-                        else
-                        if (dialect == "postgres")
-                            return "'" + str.Replace("\0", "").Replace("'", "''") + "'";
-                        else
-                        if (dialect == "mysql")
-                            return "'" + MySql.Data.MySqlClient.MySqlHelper.EscapeString(str) + "'";
-                        else
-                            throw new Exception("invalid dialect: " + dialect);
-                    }
                 case JTokenType.Boolean:
                     if (dialect == "mssql")
                         return (bool)obj ? "1" : "0";
