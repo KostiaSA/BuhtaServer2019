@@ -13,10 +13,16 @@ namespace BuhtaServer.test
         public static void test1()
         {
             Console.WriteLine("-------- начинаем ------------");
+            Console.WriteLine(BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-",""));
+            Console.WriteLine(BitConverter.ToString(Convert.FromBase64String("0KLQtdGB0YLQkdCw0LfQsDY0LVRlc3RCYXNlNjQ=")).Replace("-", ""));
+
+            ;
 
             var objStr = @"
 
 {
+  ""guid1"": ""<Guid>8D950D6B-0929-4DE1-B79C-EB06AB932CAF"",
+  ""pic1"": ""<Uint8Array>0KLQtdGB0YLQkdCw0LfQsDY0LVRlc3RCYXNlNjQ="",
   ""createdDate"": ""<Date>2017-09-25 11:03:45.046"",
   ""createdDateTime"": ""<DateTime>0001-09-26 11:03:45.046"",
   ""arr"":[1,""жо'па"",null,567], 

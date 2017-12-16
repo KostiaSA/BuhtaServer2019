@@ -28,7 +28,7 @@ namespace BuhtaServer
                     return obj;
 
                 case JTokenType.Array:
-                    for (int i= 0; i < obj.ToArray().Length;i++)
+                    for (int i = 0; i < obj.ToArray().Length; i++)
                     {
                         obj[i] = escapeSql(dialect, obj[i]);
                     }
@@ -77,7 +77,41 @@ namespace BuhtaServer
                             throw new Exception("invalid dialect: " + dialect);
 
                     }
-                    .guid
+                    else // 
+                    if (str.StartsWith("<Guid>"))
+                    {
+                        var guidStr = str.Substring("<Guid>".Length);
+                        var guid = Guid.Parse(guidStr);
+                        if (dialect == "mssql")
+                            return "CONVERT(UNIQUEIDENTIFIER,'" + guid.ToString() + "')";
+                        else
+                        if (dialect == "postgres")
+                            return "UUID '" + guid.ToString() + "'";
+                        else
+                        if (dialect == "mysql")
+                            return "convert(0x" + BitConverter.ToString(guid.ToByteArray()).Replace("-", "") + ",binary(16))";
+                        else
+                            throw new Exception("invalid dialect: " + dialect);
+                    }
+                    else
+                    if (str.StartsWith("<Uint8Array>") || str.StartsWith("<ArrayBuffer>"))
+                    {
+                        string base64;
+                        if (str.StartsWith("<Uint8Array>"))
+                            base64 = str.Substring("<Uint8Array>".Length);
+                        else
+                            base64 = str.Substring("<ArrayBuffer>".Length);
+                        var hexStr = BitConverter.ToString(Convert.FromBase64String(base64)).Replace("-", "");
+
+                        if (dialect == "mssql")
+                            return "0x" + hexStr;
+                        else if (dialect == "postgres")
+                            return "E'\\\\x" + hexStr + "'";
+                        else if (dialect == "mysql")
+                            return "convert(X'" + hexStr + "',binary)";
+                        else
+                            throw new Exception("invalid dialect: " + dialect);
+                    }
                     else
                     {
 
