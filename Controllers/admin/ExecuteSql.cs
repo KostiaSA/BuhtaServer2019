@@ -138,7 +138,8 @@ namespace BuhtaServer.Controllers
                                                 if (value is Array && (value as Array).Length == 16 && database.Dialect == "mysql")  // это guid в mysql
                                                 {
                                                     var guid = new Guid(value as byte[]);
-                                                    jsonWriter.WriteValue(guid);
+                                                    jsonWriter.WriteValue("<Guid>" + Convert.ToBase64String(guid.ToByteArray()));
+//                                                    jsonWriter.WriteValue(guid);
                                                 }
                                                 else
                                                 if (reader.GetDataTypeName(colIndex) == "BIT" && database.Dialect == "mysql")  // это boolean в mysql
@@ -149,6 +150,11 @@ namespace BuhtaServer.Controllers
                                                 if (value is Array)  // это BLOB
                                                 {
                                                     jsonWriter.WriteValue("<ArrayBuffer>" + Convert.ToBase64String((byte[])value));
+                                                }
+                                                else
+                                                if (value is Guid)  
+                                                {
+                                                    jsonWriter.WriteValue("<Guid>" + Convert.ToBase64String(((Guid)value).ToByteArray()));
                                                 }
                                                 else
                                                 if (value is DateTime)
