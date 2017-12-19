@@ -39,8 +39,14 @@ namespace BuhtaServer.Controllers
 
                 if (req.TryGetValue("jsx", out _))
                 {
-                    var jsonPath = App.GetWebRoot() + "/" + req["filePath"] + ".jsx";
-                    System.IO.File.WriteAllText(jsonPath, req["jsx"].ToString(), Encoding.UTF8);
+                    var jsxPath = App.GetWebRoot() + "/" + req["filePath"] + ".jsx";
+                    System.IO.File.WriteAllText(jsxPath, req["jsx"].ToString(), Encoding.UTF8);
+                }
+
+                if (req.TryGetValue("sql", out _))
+                {
+                    var sqlPath = App.GetWebRoot() + "/" + req["filePath"] + ".sql";
+                    System.IO.File.WriteAllText(sqlPath, req["sql"].ToString(), Encoding.UTF8);
                 }
 
                 Thread.Sleep(1000);

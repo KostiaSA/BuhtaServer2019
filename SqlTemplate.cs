@@ -174,8 +174,10 @@ namespace BuhtaServer
             //}
         }
 
-        public static string[] emitSqlBatch(string dialect, string templatePath, JToken param)
+        public static string[] emitSqlBatchFromTemplatePath(string dialect, string templatePath, JToken param)
         {
+//            JToken param = JObject.Parse(p);
+
             if (!templatePath.EndsWith(".sql"))
                 templatePath += ".sql";
 
@@ -192,6 +194,68 @@ namespace BuhtaServer
             }
 
             var sqlText = compiledFunc(param);
+
+            if (dialect == "mssql")
+            {
+                sqlText = sqlText.Replace("[[", "[").Replace("]]", "]");
+            }
+            else
+            if (dialect == "mysql")
+            {
+                sqlText = sqlText.Replace("[[", "\u0001").Replace("]]", "\u0002");
+                sqlText = sqlText.Replace("[", "`").Replace("]", "`");
+                sqlText = sqlText.Replace("\u0001", "[").Replace("\u0002", "]");
+            }
+            else
+            if (dialect == "postgres")
+            {
+                sqlText = sqlText.Replace("[[", "\u0001").Replace("]]", "\u0002");
+                sqlText = sqlText.Replace("[", @"""").Replace("]", @"""");
+                sqlText = sqlText.Replace("\u0001", "[").Replace("\u0002", "]");
+            }
+            else
+                throw new Exception("invalid sql dialect " + dialect);
+
+            string[] lines = sqlText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            var commands = new List<string>();
+
+            StringBuilder command = new StringBuilder();
+
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim();
+                if (trimmed == "GO" || trimmed == "Go" || trimmed == "gO" || trimmed == "go")
+                {
+                    commands.Add(command.ToString());
+                    command.Clear();
+                }
+                else
+                    command.AppendLine(line);
+            }
+            if (command.Length > 0)
+                commands.Add(command.ToString());
+
+            return commands.ToArray();
+        }
+
+        public static string[] emitSqlBatchFromTemplateText(string dialect, string sqlTemplateText, JToken param)
+        {
+            //            JToken param = JObject.Parse(p);
+
+            param = escapeSql(dialect, param);
+
+            //Func<object, string> compiledFunc;
+
+            //if (!CompiledTemplates.TryGetValue(templatePath, out compiledFunc))
+            //{
+            //    var fullPath = App.GetWebRoot() + "/" + templatePath;
+            //    var sqlTemplateText = File.ReadAllText(fullPath);
+            //    compiledFunc = Handlebars.Compile(sqlTemplateText);
+            //    CompiledTemplates.AddOrUpdate(templatePath, compiledFunc);
+            //}
+
+            var sqlText = Handlebars.Compile(sqlTemplateText)(param);
 
             if (dialect == "mssql")
             {
