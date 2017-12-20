@@ -174,9 +174,48 @@ namespace BuhtaServer
             //}
         }
 
+        static FileSystemWatcher watcher;
+
+
+        private static void OnChanged(object source, FileSystemEventArgs e)
+        {
+            // Specify what is done when a file is changed, created, or deleted.
+            var templatePath = e.FullPath.Replace(App.GetWebRoot(), "").Substring(1).Replace("\\", "/");
+            CompiledTemplates.TryRemove(templatePath, out _);
+            //Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+        }
+
+        private static void OnRenamed(object source, RenamedEventArgs e)
+        {
+            // Specify what is done when a file is renamed.
+            var templatePath = e.FullPath.Replace(App.GetWebRoot(), "").Substring(1).Replace("\\","/");
+            CompiledTemplates.TryRemove(templatePath, out _);
+            //Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
+        }
+
+        public static void InitSqlFilesWatcher()
+        {
+            watcher = new FileSystemWatcher();
+            watcher.IncludeSubdirectories = true;
+            watcher.Path = App.GetWebRoot();
+
+            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            
+            watcher.Filter = "*.sql";
+
+            
+            watcher.Changed += new FileSystemEventHandler(OnChanged);
+            watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Deleted += new FileSystemEventHandler(OnChanged);
+            watcher.Renamed += new RenamedEventHandler(OnRenamed);
+            
+            watcher.EnableRaisingEvents = true;
+        }
+
         public static string[] emitSqlBatchFromTemplatePath(string dialect, string templatePath, JToken param)
         {
-//            JToken param = JObject.Parse(p);
+
 
             if (!templatePath.EndsWith(".sql"))
                 templatePath += ".sql";

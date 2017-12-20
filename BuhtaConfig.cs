@@ -19,6 +19,7 @@ namespace BuhtaServer
     {
         public string Name;
         public string Dialect;
+        public string Note;
         public string ConnectionString;
     }
 }

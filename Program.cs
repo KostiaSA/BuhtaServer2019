@@ -22,6 +22,7 @@ namespace BuhtaServer
         public static void Main(string[] args)
         {
             //TestHandlebars.test1();
+            SqlTemplate.InitSqlFilesWatcher();
             BuildWebHost(args).Run();
         }
 

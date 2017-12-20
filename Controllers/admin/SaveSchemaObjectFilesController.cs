@@ -49,7 +49,7 @@ namespace BuhtaServer.Controllers
                     System.IO.File.WriteAllText(sqlPath, req["sql"].ToString(), Encoding.UTF8);
                 }
 
-                Thread.Sleep(1000);
+                //Thread.Sleep(100);
 
                 return new { };
             }
