@@ -19,7 +19,10 @@ namespace HandlebarsDotNet
 
         public ViewEngineFileSystem FileSystem { get; set; }
 
-	    public string UnresolvedBindingFormatter { get; set; }
+        //buhta
+        public string RaiseErrorOnUnresolved { get; set; }
+
+        public string UnresolvedBindingFormatter { get; set; }
 	    public bool ThrowOnUnresolvedBindingExpression { get; set; }
 
 	    public HandlebarsConfiguration()

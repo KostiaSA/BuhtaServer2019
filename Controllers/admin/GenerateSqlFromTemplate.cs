@@ -31,7 +31,7 @@ namespace BuhtaServer.Controllers
                 if (!AuthOk())
                     return NoAuthResponse();
 
-                    return new { sql = SqlTemplate.emitSqlBatchFromTemplateText(req.dialect.ToString(), req.sqlTemplate.ToString(), JObject.Parse(req.paramsObj.ToString())) };
+                    return new { sql = SqlTemplate.emitSqlBatchFromTemplateText(req.dialect.ToString(), req.sqlTemplate.ToString(), JObject.Parse(req.paramsObj.ToString()), HttpContext, Request) };
 
             }
             catch (Exception e)

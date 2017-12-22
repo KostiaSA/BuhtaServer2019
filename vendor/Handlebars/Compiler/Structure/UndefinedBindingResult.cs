@@ -17,8 +17,11 @@ namespace HandlebarsDotNet.Compiler
 
         public override string ToString()
         {
-	        var formatter = _configuration.UnresolvedBindingFormatter ?? string.Empty;
-	        return string.Format( formatter, Value );
+            //var formatter = _configuration.UnresolvedBindingFormatter ?? string.Empty;
+            //return string.Format( formatter, Value );
+
+            // buhta
+            return "{{" + Value + "}}";
         }
     }
 }

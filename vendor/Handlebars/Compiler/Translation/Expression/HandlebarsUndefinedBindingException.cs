@@ -4,7 +4,8 @@ namespace HandlebarsDotNet.Compiler
 {
     public class HandlebarsUndefinedBindingException : Exception
     {
-        public HandlebarsUndefinedBindingException(string path, string missingKey) : base(missingKey + " is undefined")
+        // buhta
+        public HandlebarsUndefinedBindingException(string path, string missingKey) : base("невозможно вычислить SQL-шаблон {{"+path+ "}}")
         {
             this.Path = path;
             this.MissingKey = missingKey;

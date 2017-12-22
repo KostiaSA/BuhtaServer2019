@@ -70,29 +70,32 @@ namespace BuhtaServer.test
 
 ";
 
+            //var xxx = JObject.Parse(objStr);
+            //xxx.TryAdd("_UserName_","Сидоров");
 
 
-            Console.WriteLine(String.Join("\n =========================\n", SqlTemplate.emitSqlBatchFromTemplatePath("mssql", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr))));
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(String.Join("\n=========================\n", SqlTemplate.emitSqlBatchFromTemplatePath("mysql", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr))));
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(String.Join("\n=========================\n", SqlTemplate.emitSqlBatchFromTemplatePath("postgres", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr))));
+
+            //Console.WriteLine(String.Join("\n =========================\n", SqlTemplate.emitSqlBatchFromTemplatePath("mssql", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr))));
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine(String.Join("\n=========================\n", SqlTemplate.emitSqlBatchFromTemplatePath("mysql", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr))));
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine(String.Join("\n=========================\n", SqlTemplate.emitSqlBatchFromTemplatePath("postgres", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr))));
 
 
-            Console.ReadKey();
-            string[] x;
-            for (int i = 0; i < 1000; i++)
-            {
-                Console.WriteLine("Ok---------------" + i);
-                x = SqlTemplate.emitSqlBatchFromTemplatePath("mssql", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr));
-            }
-            Console.WriteLine("Ok---------------");
+            //Console.ReadKey();
+            //string[] x;
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    Console.WriteLine("Ok---------------" + i);
+            //    x = SqlTemplate.emitSqlBatchFromTemplatePath("mssql", "buhta/core-tests/sql/test-query.sql", JObject.Parse(objStr));
+            //}
+            //Console.WriteLine("Ok---------------");
 
-            Console.ReadKey();
+            //Console.ReadKey();
         }
 
 

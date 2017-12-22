@@ -1,4 +1,5 @@
 ﻿using HandlebarsDotNet;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
@@ -176,6 +177,10 @@ namespace BuhtaServer
 
         static FileSystemWatcher watcher;
 
+        static void InitSqlTemplates()
+        {
+
+        }
 
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
@@ -188,7 +193,7 @@ namespace BuhtaServer
         private static void OnRenamed(object source, RenamedEventArgs e)
         {
             // Specify what is done when a file is renamed.
-            var templatePath = e.FullPath.Replace(App.GetWebRoot(), "").Substring(1).Replace("\\","/");
+            var templatePath = e.FullPath.Replace(App.GetWebRoot(), "").Substring(1).Replace("\\", "/");
             CompiledTemplates.TryRemove(templatePath, out _);
             //Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
         }
@@ -201,38 +206,49 @@ namespace BuhtaServer
 
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            
+
             watcher.Filter = "*.sql";
 
-            
+
             watcher.Changed += new FileSystemEventHandler(OnChanged);
             watcher.Created += new FileSystemEventHandler(OnChanged);
             watcher.Deleted += new FileSystemEventHandler(OnChanged);
             watcher.Renamed += new RenamedEventHandler(OnRenamed);
-            
+
             watcher.EnableRaisingEvents = true;
         }
 
-        public static string[] emitSqlBatchFromTemplatePath(string dialect, string templatePath, JToken param)
+        // для боевого запуска SQL
+        public static string[] emitSqlBatchFromTemplatePath(string dialect, string templatePath, JObject param, HttpContext httpContext, HttpRequest httpRequest)
         {
 
 
             if (!templatePath.EndsWith(".sql"))
                 templatePath += ".sql";
 
-            param = escapeSql(dialect, param);
+            addServerTokens(dialect, param, httpContext, httpRequest);
+
+            var _param = escapeSql(dialect, param);
 
             Func<object, string> compiledFunc;
 
-            if (!CompiledTemplates.TryGetValue(templatePath, out compiledFunc))
+            if (!CompiledTemplates.TryGetValue(dialect + "*" + templatePath, out compiledFunc))
             {
                 var fullPath = App.GetWebRoot() + "/" + templatePath;
                 var sqlTemplateText = File.ReadAllText(fullPath);
-                compiledFunc = Handlebars.Compile(sqlTemplateText);
-                CompiledTemplates.AddOrUpdate(templatePath, compiledFunc);
+
+                var config = new HandlebarsConfiguration
+                {
+                    ThrowOnUnresolvedBindingExpression = true
+                };
+                var handlebars = Handlebars.Create(config);
+                registerHelpers(handlebars, dialect);
+                compiledFunc = handlebars.Compile(sqlTemplateText);
+
+                CompiledTemplates.AddOrUpdate(dialect + "*" + templatePath, compiledFunc);
             }
 
-            var sqlText = compiledFunc(param);
+            var sqlText = compiledFunc(_param);
 
             if (dialect == "mssql")
             {
@@ -278,23 +294,71 @@ namespace BuhtaServer
             return commands.ToArray();
         }
 
-        public static string[] emitSqlBatchFromTemplateText(string dialect, string sqlTemplateText, JToken param)
+        private static void registerHelpers(IHandlebars handlebars, string dialect)
+        {
+            handlebars.RegisterHelper("_ServerCurrentTime_", (writer, context, args) =>
+            {
+                if (dialect == "mssql")
+                    writer.Write("getdate()");
+                else
+                if (dialect == "mysql")
+                    writer.Write("now()");
+                else
+                if (dialect == "postgres")
+                    writer.Write("current_time");
+                else
+                {
+                    throw new Exception("BuhtaServer.registerHelpers(): неверный SQL-диалект '" + dialect + "'");
+                }
+            });
+
+        }
+
+        private static void addServerTokens(string dialect, JObject param, HttpContext httpContext, HttpRequest httpRequest)
+        {
+            param.TryAdd("_UserName_", "Иванов");
+            param.TryAdd("_UserId_", "<Guid>bf261725-b1f4-4e84-95fe-fd892d7493e4");
+            param.TryAdd("_UserIP_", httpContext.Connection.RemoteIpAddress.MapToIPv4().ToString());
+            if (dialect == "mssql")
+            {
+            }
+            else
+            if (dialect == "mysql")
+            {
+            }
+            else
+            if (dialect == "postgres")
+            {
+            }
+            else
+            {
+                throw new Exception("BuhtaServer.registerHelpers(): неверный SQL-диалект '" + dialect + "'");
+            }
+
+        }
+
+
+
+        // только для показа SQL в режиме редактирования запроса
+        public static string[] emitSqlBatchFromTemplateText(string dialect, string sqlTemplateText, JObject param, HttpContext httpContext, HttpRequest httpRequest)
         {
             //            JToken param = JObject.Parse(p);
 
-            param = escapeSql(dialect, param);
 
-            //Func<object, string> compiledFunc;
+            addServerTokens(dialect, param, httpContext, httpRequest);
 
-            //if (!CompiledTemplates.TryGetValue(templatePath, out compiledFunc))
-            //{
-            //    var fullPath = App.GetWebRoot() + "/" + templatePath;
-            //    var sqlTemplateText = File.ReadAllText(fullPath);
-            //    compiledFunc = Handlebars.Compile(sqlTemplateText);
-            //    CompiledTemplates.AddOrUpdate(templatePath, compiledFunc);
-            //}
+            var _param = escapeSql(dialect, param);
 
-            var sqlText = Handlebars.Compile(sqlTemplateText)(param);
+            var config = new HandlebarsConfiguration
+            {
+                ThrowOnUnresolvedBindingExpression = false
+            };
+
+
+            var handlebars = Handlebars.Create(config);
+            registerHelpers(handlebars, dialect);
+            var sqlText = handlebars.Compile(sqlTemplateText)(_param);
+
 
             if (dialect == "mssql")
             {

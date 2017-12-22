@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Npgsql;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace BuhtaServer.Controllers
 {
@@ -70,7 +71,7 @@ namespace BuhtaServer.Controllers
                 var sqlTemplatePath = req.sqlTemplatePath.ToString();
                 var paramsObj = req.paramsObj.ToString();
 
-                var sqlLines = SqlTemplate.emitSqlBatchFromTemplatePath(database.Dialect, sqlTemplatePath, JObject.Parse(paramsObj));
+                var sqlLines = SqlTemplate.emitSqlBatchFromTemplatePath(database.Dialect, sqlTemplatePath, JObject.Parse(paramsObj),HttpContext,Request);
 
 
                 try
@@ -243,11 +244,9 @@ namespace BuhtaServer.Controllers
                             jsonWriter.WriteEndObject();
 
                         }
-                        //Console.WriteLine("req: " + json);
-                        //Console.WriteLine("abs: " + sb.ToString());
 
-                        return new ResponseObject() { compressed = Utils.CompressToByteArray(sb.ToString()) };
-                        //return new ResponseObject() { json = sb.ToString() };
+                        return new ResponseObject() { compressed = Utils.CompressToByteArray(sb.ToString()) };   
+                        //return new ResponseObject() { json = sb.ToString() };  // это вариант без компрессии 
                     }
                 }
                 catch (Exception e)
