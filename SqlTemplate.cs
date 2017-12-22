@@ -314,11 +314,30 @@ namespace BuhtaServer
 
         }
 
+        // для подсказок
+        private static Object[] getServerTokensList()
+        {
+            return new Object[]
+            {
+                new { token="_UserName_",note="Имя пользователя (Строка)"},
+                new { token="_UserId_",note="Id пользователя (Guid)"},
+                new { token="_UserIP_",note="IP-адрес пользователя (Строка) в формате '192.168.0.104'"},
+                new { token="_ServerCurrentTime_",note="Текущее время сервера (ДатаВремя)"},
+            };
+        }
+
+
         private static void addServerTokens(string dialect, JObject param, HttpContext httpContext, HttpRequest httpRequest)
         {
-            param.TryAdd("_UserName_", "Иванов");
-            param.TryAdd("_UserId_", "<Guid>bf261725-b1f4-4e84-95fe-fd892d7493e4");
-            param.TryAdd("_UserIP_", httpContext.Connection.RemoteIpAddress.MapToIPv4().ToString());
+            if (!param.TryAdd("_UserName_", "Иванов"))
+                throw new Exception("BuhtaServer.addServerTokens(): недопустимый параметр sql '_UserName_'");
+
+            if (!param.TryAdd("_UserId_", "<Guid>bf261725-b1f4-4e84-95fe-fd892d7493e4"))
+                throw new Exception("BuhtaServer.addServerTokens(): недопустимый параметр sql '_UserId_'");
+
+            if (!param.TryAdd("_UserIP_", httpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()))
+                throw new Exception("BuhtaServer.addServerTokens(): недопустимый параметр sql '_UserIP_'");
+
             if (dialect == "mssql")
             {
             }
