@@ -55,13 +55,21 @@ namespace BuhtaServer
                 .UseKestrel(options =>
                 {
                     options.AddServerHeader = false;
-                    options.Listen(IPAddress.Loopback, App.GetPort(), listenOptions =>
+                    //options.Listen(IPAddress.Loopback, App.GetPort(), listenOptions =>
+                    //{
+                    //    listenOptions.UseHttps(certificate);
+                    //});
+                    options.Listen(IPAddress.Any, App.GetPort(), listenOptions =>
                     {
-                        listenOptions.UseHttps(certificate);
+                        listenOptions.UseHttps(new X509Certificate2("buhta2019.pfx", "buhta123"));
+                    });
+                    options.Listen(IPAddress.Any, 4439, listenOptions =>
+                    {
+                        listenOptions.UseHttps(new X509Certificate2("buhta2019.pfx", "buhta123"));
                     });
                 })
                 .UseWebRoot(App.GetWebRoot())
-                .UseUrls(App.GetUrls())
+                //.UseUrls(App.GetUrls(),"http://127.0.0.1:8080")
                 .UseStartup<Startup>()
                 .Build();
         }

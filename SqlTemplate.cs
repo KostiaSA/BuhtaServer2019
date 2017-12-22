@@ -13,7 +13,7 @@ namespace BuhtaServer
 {
     public class SqlTemplate
     {
-        static ConcurrentDictionary<string, Func<object, string>> CompiledTemplates = new ConcurrentDictionary<string, Func<object, string>>();
+        public static ConcurrentDictionary<string, Func<object, string>> CompiledTemplates = new ConcurrentDictionary<string, Func<object, string>>();
 
         static JToken escapeSql(string dialect, JToken obj)
         {

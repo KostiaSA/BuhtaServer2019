@@ -47,6 +47,7 @@ namespace BuhtaServer.Controllers
                 {
                     var sqlPath = App.GetWebRoot() + "/" + req["filePath"] + ".sql";
                     System.IO.File.WriteAllText(sqlPath, req["sql"].ToString(), Encoding.UTF8);
+                    SqlTemplate.CompiledTemplates.Clear();
                 }
 
                 //Thread.Sleep(100);

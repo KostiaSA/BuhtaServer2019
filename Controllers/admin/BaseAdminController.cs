@@ -9,13 +9,13 @@ namespace BuhtaServer.Controllers
 {
     public class BaseAdminController : Controller
     {
-        public bool AuthOk()
+        protected bool AuthOk()
         {
             return true;
             //return HttpContext.Session.GetInt32("adminauth") == 1;
         }
 
-        public Object NoAuthResponse() {
+        protected Object NoAuthResponse() {
             return new { error = "NoAdminAuth" };
         }
 
