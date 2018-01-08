@@ -5,13 +5,13 @@
 			"name": "main",
 			"dialect": "mssql",
 			"note": "основная",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;"
+			"connectionString": "Server=localhost;User Id=sa;Password=sonyk;Database=MAG3305;"
 		},
 		{
 			"name": "testmssql",
 			"dialect": "mssql",
 			"note": "для тестов MSSQL",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;"
+			"connectionString": "Server=localhost;User Id=sa;Password=sonyk;Database=MAG3305;"
 		},
 		{
 			"name": "testpostgres",
@@ -30,7 +30,7 @@
 			"name": "mag3666",
 			"dialect": "mssql",
 			"note": "магазин техносилы",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=MAG3666;"
+			"connectionString": "Server=localhost;User Id=sa;Password=sonyk;Database=MAG3305;"
 		}
 	]
 }
