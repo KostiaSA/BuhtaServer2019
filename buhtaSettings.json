@@ -17,14 +17,14 @@
 			"name": "testpostgres",
 			"dialect": "postgres",
 			"note": "для тестов Postgres",
-			"connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk2128506;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;"
+			"connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;"
 		},
 		{
 			"name": "testmysql",
 			"dialect": "mysql",
 			"note": "для тестов MySQL",
 
-			"connectionString": "User ID=root;Password=sonyk2128506;Host=192.168.0.70;Port=3306;Database=buhta2018_test;"
+			"connectionString": "User ID=root;Password=sonyk;Host=192.168.0.70;Port=3306;Database=buhta2018_test;"
 		},
 		{
 			"name": "mag3666",
