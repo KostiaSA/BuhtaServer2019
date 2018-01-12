@@ -11,6 +11,7 @@ using MySql.Data.MySqlClient;
 using Npgsql;
 using System.Data;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 
 namespace BuhtaServer
 {
@@ -137,6 +138,58 @@ namespace BuhtaServer
 
         }
 
+        public static void ExecuteSql(string dbName, IEnumerable<string> sqlBatch)
+        {
+            var database = Program.BuhtaConfig.GetDatabase(dbName);
+            if (database == null)
+                throw new Exception($"invalid database '{dbName}'");
+
+            DbConnection conn;
+
+            if (database.Dialect == "mssql")
+                conn = new SqlConnection(database.ConnectionString);
+            else
+            if (database.Dialect == "mysql")
+                conn = new MySqlConnection(database.ConnectionString);
+            else
+            if (database.Dialect == "postgres")
+                conn = new NpgsqlConnection(database.ConnectionString);
+            else
+            {
+                throw new Exception($"invalid database sql dialect '{database.Dialect}'");
+            }
+
+            if (database.Dialect == "mssql")
+            {
+                using (conn)
+                {
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = String.Join("\n",sqlBatch);
+                        cmd.ExecuteNonQuery();
+                        cmd.Dispose();
+                    }
+                }
+            }
+            else
+            {
+                using (conn)
+                {
+                    conn.Open();
+                    foreach (var sql in sqlBatch)
+                    {
+                        using (var cmd = conn.CreateCommand())
+                        {
+                            cmd.CommandText = sql;
+                            cmd.ExecuteNonQuery();
+                            cmd.Dispose();
+                        }
+                    }
+                }
+            }
+        }
+
         public static string StringAsSql(string str, string dialect)
         {
             if (dialect == "mssql")
@@ -229,7 +282,7 @@ namespace BuhtaServer
                     {
                         string name = kvPair.Key;
                         JToken value = kvPair.Value;
-                        obj[kvPair.Key] = parseXJSON( kvPair.Value);
+                        obj[kvPair.Key] = parseXJSON(kvPair.Value);
                     }
                     return obj;
 
@@ -323,8 +376,28 @@ namespace BuhtaServer
                 default:
                     throw new Exception("unknown token");
             }
-         
+
         }
 
+        public static string GetRandomString(int maxSize)
+        {
+            char[] chars = new char[62];
+            chars =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+            byte[] data = new byte[1];
+            using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
+            {
+                crypto.GetNonZeroBytes(data);
+                data = new byte[maxSize];
+                crypto.GetNonZeroBytes(data);
+            }
+            StringBuilder result = new StringBuilder(maxSize);
+            foreach (byte b in data)
+            {
+                result.Append(chars[b % (chars.Length)]);
+            }
+            return result.ToString();
+        }
     }
+
 }

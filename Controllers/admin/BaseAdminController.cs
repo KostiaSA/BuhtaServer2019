@@ -9,16 +9,26 @@ namespace BuhtaServer.Controllers
 {
     public class BaseAdminController : Controller
     {
-        protected bool AuthOk(Guid sessionId,string authToken)
+        protected UserSession UserSession;
+
+        protected bool AuthOk(Guid sessionId, string authToken)
         {
-            Console.WriteLine("AuthOk: "+ sessionId+",  "+authToken);
-            return true;
-            //return HttpContext.Session.GetInt32("adminauth") == 1;
+            Console.WriteLine("Auth: " + sessionId + ",  " + authToken);
+
+            var sessionOk = Auth.UserSessions.TryGetValue(sessionId, out UserSession);
+
+            if (sessionOk)
+            {
+                return authToken == UserSession.AuthToken;
+            }
+
+            return false;
         }
 
-        protected Object NoAuthResponse() {
-            return new { error = "NoAdminAuth" };
+        protected Object NoAuthResponse()
+        {
+            return new { error = "Требуется авторизация" };
         }
 
-}
+    }
 }
