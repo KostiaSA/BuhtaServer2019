@@ -246,6 +246,9 @@ namespace BuhtaServer
                 case JTokenType.Float:
                     return obj;
 
+                case JTokenType.Date:
+                    return obj;
+
                 case JTokenType.String:
                     var str = (string)obj;
                     if (str.StartsWith("<"))
@@ -307,8 +310,6 @@ namespace BuhtaServer
                     throw new Exception("JTokenType.Comment: internal error");
                 case JTokenType.Undefined:
                     throw new Exception("JTokenType.Undefined: internal error");
-                case JTokenType.Date:
-                    throw new Exception("JTokenType.Date: internal error");
                 case JTokenType.Raw:
                     throw new Exception("JTokenType.Raw: internal error");
                 case JTokenType.Bytes:

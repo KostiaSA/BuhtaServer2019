@@ -19,34 +19,37 @@ namespace BuhtaServer.Controllers
     {
 
         [HttpPost]
-        public object Post([FromBody] JObject req)
+        public object Post([FromBody] dynamic req)
         {
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
 
-                var folder = App.GetWebRoot() + "/" + req["filePath"];
+                var folder = App.GetWebRoot() + "/" + request["filePath"];
                 folder = folder.Remove(folder.LastIndexOf("/") + 1);
                 System.IO.Directory.CreateDirectory(folder);
 
-                if (req.TryGetValue("json",out _))
+                JToken fakeOut;
+                if (request.TryGetValue("json",out fakeOut))
                 {
-                    var jsonPath = App.GetWebRoot() + "/" + req["filePath"] + ".json";
-                    System.IO.File.WriteAllText(jsonPath, req["json"].ToString(), Encoding.UTF8);
+                    var jsonPath = App.GetWebRoot() + "/" + request["filePath"] + ".json";
+                    System.IO.File.WriteAllText(jsonPath, request["json"].ToString(), Encoding.UTF8);
                 }
 
-                if (req.TryGetValue("jsx", out _))
+                if (request.TryGetValue("jsx", out fakeOut))
                 {
-                    var jsxPath = App.GetWebRoot() + "/" + req["filePath"] + ".jsx";
-                    System.IO.File.WriteAllText(jsxPath, req["jsx"].ToString(), Encoding.UTF8);
+                    var jsxPath = App.GetWebRoot() + "/" + request["filePath"] + ".jsx";
+                    System.IO.File.WriteAllText(jsxPath, request["jsx"].ToString(), Encoding.UTF8);
                 }
 
-                if (req.TryGetValue("sql", out _))
+                if (request.TryGetValue("sql", out fakeOut))
                 {
-                    var sqlPath = App.GetWebRoot() + "/" + req["filePath"] + ".sql";
-                    System.IO.File.WriteAllText(sqlPath, req["sql"].ToString(), Encoding.UTF8);
+                    var sqlPath = App.GetWebRoot() + "/" + request["filePath"] + ".sql";
+                    System.IO.File.WriteAllText(sqlPath, request["sql"].ToString(), Encoding.UTF8);
                     SqlTemplate.CompiledTemplates.Clear();
                 }
 

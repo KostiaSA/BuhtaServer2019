@@ -16,10 +16,10 @@ namespace BuhtaServer.Controllers
     [Route("api/admin/generateSqlFromTemplate")]
     public class AdminGenerateSqlFromTemplateController : BaseAdminController
     {
-        class ResponseObject
-        {
-            public string sql;
-        }
+        //class ResponseObject
+        //{
+        //    public string sql;
+        //}
 
         [HttpPost]
         public object Post([FromBody]dynamic req)
@@ -28,10 +28,13 @@ namespace BuhtaServer.Controllers
 
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
-                    return new { sql = SqlTemplate.emitSqlBatchFromTemplateText(req.dialect.ToString(), req.sqlTemplate.ToString(), JObject.Parse(req.paramsObj.ToString()), HttpContext, Request) };
+                //                return new { sql = SqlTemplate.emitSqlBatchFromTemplateText(req.dialect.ToString(), req.sqlTemplate.ToString(), JObject.Parse(req.paramsObj.ToString()), HttpContext, Request) };
+                return new { sql = SqlTemplate.emitSqlBatchFromTemplateText(request["dialect"].ToString(), request["sqlTemplate"].ToString(), (JObject)request["paramsObj"], HttpContext, Request) };
 
             }
             catch (Exception e)

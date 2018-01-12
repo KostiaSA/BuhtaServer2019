@@ -44,13 +44,15 @@ namespace BuhtaServer.Controllers
         {
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
-                var database = Program.BuhtaConfig.GetDatabase(req.dbName.ToString());
+                var database = Program.BuhtaConfig.GetDatabase(request["dbName"].ToString());
                 if (database == null)
                 {
-                    return new ResponseObject() { error = $"invalid database '{req.dbName}'" };
+                    return new ResponseObject() { error = $"invalid database '{request["dbName"]}'" };
                 }
 
                 DbConnection conn;
@@ -68,11 +70,12 @@ namespace BuhtaServer.Controllers
                     return new ResponseObject() { error = $"invalid database sql dialect '{database.Dialect}'" };
                 }
 
-                var sqlTemplatePath = req.sqlTemplatePath.ToString();
-                var paramsObj = req.paramsObj.ToString();
+                var sqlTemplatePath = request["sqlTemplatePath"].ToString();
 
-                var sqlLines = SqlTemplate.emitSqlBatchFromTemplatePath(database.Dialect, sqlTemplatePath, JObject.Parse(paramsObj),HttpContext,Request);
+                //var paramsObj = req.paramsObj.ToString();
+                //var sqlLines = SqlTemplate.emitSqlBatchFromTemplatePath(database.Dialect, sqlTemplatePath, JObject.Parse(paramsObj),HttpContext,Request);
 
+                var sqlLines = SqlTemplate.emitSqlBatchFromTemplatePath(database.Dialect, sqlTemplatePath, (JObject)request["paramsObj"], HttpContext, Request);
 
                 try
                 {

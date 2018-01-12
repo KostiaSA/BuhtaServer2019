@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace BuhtaServer.Controllers
 {
@@ -26,11 +27,13 @@ namespace BuhtaServer.Controllers
         {
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
 
-                var jsonPath = App.GetWebRoot() + "/" + req.filePath + ".json";
+                var jsonPath = App.GetWebRoot() + "/" + request["filePath"] + ".json";
                 var res = new ResponseObject();
                 var ok = false;
                 if (System.IO.File.Exists(jsonPath))
@@ -39,7 +42,7 @@ namespace BuhtaServer.Controllers
                     ok = true;
                 }
 
-                var jsxPath = App.GetWebRoot() + "/" + req.filePath + ".jsx";
+                var jsxPath = App.GetWebRoot() + "/" + request["filePath"] + ".jsx";
                 if (System.IO.File.Exists(jsxPath))
                 {
                     res.json = System.IO.File.ReadAllText(jsxPath, Encoding.UTF8);
@@ -48,7 +51,7 @@ namespace BuhtaServer.Controllers
 
 
                 if (!ok)
-                    return new { error = "не найден файл '"+ req.filePath + ".json (или .jsx)'" };
+                    return new { error = "не найден файл '"+ request["filePath"] + ".json (или .jsx)'" };
                 else
                     return res;
             }

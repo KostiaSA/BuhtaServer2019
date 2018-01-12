@@ -16,10 +16,10 @@ namespace BuhtaServer.Controllers
     [Route("api/getDatabasesList")]
     public class GetDatabasesListController : BaseAdminController
     {
-        class ResponseObject
-        {
-            public string sql;
-        }
+        //class ResponseObject
+        //{
+        //    public string sql;
+        //}
 
         [HttpPost]
         public object Post([FromBody]dynamic req)
@@ -27,7 +27,9 @@ namespace BuhtaServer.Controllers
 
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
                 return new { dbList = Program.BuhtaConfig.databases.Select(db => new { name = db.Name, dialect = db.Dialect, note = db.Note, sqlName = db.SqlName }).ToArray() };

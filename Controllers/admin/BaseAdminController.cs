@@ -9,9 +9,9 @@ namespace BuhtaServer.Controllers
 {
     public class BaseAdminController : Controller
     {
-        protected bool AuthOk()
+        protected bool AuthOk(Guid sessionId,string authToken)
         {
-            Console.WriteLine(HttpContext.Session.Id);
+            Console.WriteLine("AuthOk: "+ sessionId+",  "+authToken);
             return true;
             //return HttpContext.Session.GetInt32("adminauth") == 1;
         }

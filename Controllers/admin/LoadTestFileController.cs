@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace BuhtaServer.Controllers
 {
@@ -25,10 +26,12 @@ namespace BuhtaServer.Controllers
         {
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
-                var fullPath = App.GetWebRoot() + "/" + req.filePath;
+                var fullPath = App.GetWebRoot() + "/" + request["filePath"];
                 var res = new ResponseObject();
                 if (System.IO.File.Exists(fullPath))
                 {
@@ -37,7 +40,7 @@ namespace BuhtaServer.Controllers
 
                 }
                 else
-                    return new { error = "не найден файл '"+ req.filePath + ".json (или .jsx)'" };
+                    return new { error = "не найден файл '"+ request["filePath"] + ".json (или .jsx)'" };
             }
             catch (Exception e)
             {

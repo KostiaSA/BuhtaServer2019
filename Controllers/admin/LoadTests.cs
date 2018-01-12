@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace BuhtaServer.Controllers
 {
@@ -69,12 +70,14 @@ namespace BuhtaServer.Controllers
         {
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
                 var res = new ResponseObject();
                 res.name = "root";
-                loadFileNames(res, App.GetWebRoot() + "/" + req.path);
+                loadFileNames(res, App.GetWebRoot() + "/" + request["path"]);
                 return res;
             }
             catch (Exception e)

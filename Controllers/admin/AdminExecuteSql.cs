@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using Newtonsoft.Json;
 using Npgsql;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json.Linq;
 
 namespace BuhtaServer.Controllers
 {
@@ -42,13 +43,15 @@ namespace BuhtaServer.Controllers
         {
             try
             {
-                if (!AuthOk())
+                var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
+
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
-                var database = Program.BuhtaConfig.GetDatabase(req.database.ToString());
+                var database = Program.BuhtaConfig.GetDatabase(request["database"].ToString());
                 if (database == null)
                 {
-                    return new ResponseObject() { error = $"invalid database '{req.database}'" };
+                    return new ResponseObject() { error = $"invalid database '{request["database"]}'" };
                 }
 
                 DbConnection conn;
@@ -85,7 +88,7 @@ namespace BuhtaServer.Controllers
                             jsonWriter.WritePropertyName("rowsets");
                             jsonWriter.WriteStartArray();
 
-                            foreach (string sql in req.sql)
+                            foreach (string sql in request["sql"])
                             {
                                 using (var cmd = conn.CreateCommand())
                                 {

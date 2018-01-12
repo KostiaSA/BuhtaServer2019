@@ -41,6 +41,12 @@ namespace BuhtaServer
                 case JTokenType.Float:
                     return obj.ToString().Replace(",", ".");
 
+                case JTokenType.Date:
+                    return Utils.DateTimeAsSql((DateTime)obj, dialect);
+
+                case JTokenType.Guid:
+                    return Utils.GuidAsSql((Guid)obj, dialect);
+
                 case JTokenType.String:
                     var str = (string)obj;
                     if (str.StartsWith("<"))
@@ -163,14 +169,10 @@ namespace BuhtaServer
                     throw new Exception("JTokenType.Comment: internal error");
                 case JTokenType.Undefined:
                     throw new Exception("JTokenType.Undefined: internal error");
-                case JTokenType.Date:
-                    throw new Exception("JTokenType.Date: internal error");
                 case JTokenType.Raw:
                     throw new Exception("JTokenType.Raw: internal error");
                 case JTokenType.Bytes:
                     throw new Exception("JTokenType.Bytes: internal error");
-                case JTokenType.Guid:
-                    throw new Exception("JTokenType.Guid: internal error");
                 case JTokenType.Uri:
                     throw new Exception("JTokenType.Uri: internal error");
                 case JTokenType.TimeSpan:

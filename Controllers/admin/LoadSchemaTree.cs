@@ -76,12 +76,9 @@ namespace BuhtaServer.Controllers
         {
             try
             {
-                //var jObject = JObject.Parse(req.xjson.ToString());
                 var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
 
-                //var xxx = request["sessionId"];
-
-                if (!AuthOk())
+                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
                 var res = new ResponseObject();
