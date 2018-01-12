@@ -19,6 +19,7 @@ namespace BuhtaServer
     {
         public static BuhtaConfig BuhtaConfig;
 
+
         public static void Main(string[] args)
         {
             //TestHandlebars.test1();
@@ -43,13 +44,6 @@ namespace BuhtaServer
             var certificate = new X509Certificate2(certificateFileName, certificatePassword);
 
             BuhtaConfig = JsonConvert.DeserializeObject<BuhtaConfig>(File.ReadAllText("buhtaSettings.json"));
-            //var qqq = config.GetSection("qqq");
-            //var databasesSettings = config.GetSection("databases").GetChildren().Select(x => {
-            //    return x as Database;
-            //}).ToArray<Database>();
-            
-
-
 
             return WebHost.CreateDefaultBuilder(args)
                 .UseKestrel(options =>

@@ -1,36 +1,48 @@
 ﻿{
-	"qqq": "222",
+	"serverUniqueName": "BuhtaServer1",
 	"databases": [
+		{
+			"name": "auth",
+			"dialect": "mssql",
+			"note": "клиентские сессии, авторизация, журнал событий",
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_auth;",
+			"sqlName": "Buhta2018_auth"
+		},
 		{
 			"name": "main",
 			"dialect": "mssql",
 			"note": "основная",
-			"connectionString": "Server=localhost;User Id=sa;Password=sonyk;Database=MAG3305;"
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018;",
+			"sqlName": "Buhta2018"
 		},
 		{
 			"name": "testmssql",
 			"dialect": "mssql",
 			"note": "для тестов MSSQL",
-			"connectionString": "Server=localhost;User Id=sa;Password=sonyk;Database=MAG3305;"
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;",
+			"sqlName": "Buhta2018_test"
 		},
 		{
 			"name": "testpostgres",
 			"dialect": "postgres",
 			"note": "для тестов Postgres",
-			"connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;"
+			"connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk2128506;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;",
+			"sqlName": "Buhta2018_test"
 		},
 		{
 			"name": "testmysql",
 			"dialect": "mysql",
 			"note": "для тестов MySQL",
 
-			"connectionString": "User ID=root;Password=sonyk;Host=192.168.0.70;Port=3306;Database=buhta2018_test;"
+			"connectionString": "User ID=root;Password=sonyk2128506;Host=192.168.0.70;Port=3306;Database=buhta2018_test;",
+			"sqlName": "Buhta2018_test"
 		},
 		{
 			"name": "mag3666",
 			"dialect": "mssql",
 			"note": "магазин техносилы",
-			"connectionString": "Server=localhost;User Id=sa;Password=sonyk;Database=MAG3305;"
+			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=MAG3666;",
+			"sqlName": "MAG3666"
 		}
 	]
 }

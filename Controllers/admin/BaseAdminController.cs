@@ -11,6 +11,7 @@ namespace BuhtaServer.Controllers
     {
         protected bool AuthOk()
         {
+            Console.WriteLine(HttpContext.Session.Id);
             return true;
             //return HttpContext.Session.GetInt32("adminauth") == 1;
         }

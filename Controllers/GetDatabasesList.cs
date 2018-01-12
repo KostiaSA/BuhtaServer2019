@@ -30,7 +30,7 @@ namespace BuhtaServer.Controllers
                 if (!AuthOk())
                     return NoAuthResponse();
 
-                return new { dbList = Program.BuhtaConfig.databases.Select(db => new { name = db.Name, dialect = db.Dialect, note = db.Note }).ToArray() };
+                return new { dbList = Program.BuhtaConfig.databases.Select(db => new { name = db.Name, dialect = db.Dialect, note = db.Note, sqlName = db.SqlName }).ToArray() };
 
             }
             catch (Exception e)

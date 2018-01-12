@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Net.WebSockets;
+using System.Threading;
 
 namespace BuhtaServer
 {
@@ -77,7 +78,13 @@ namespace BuhtaServer
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        var result=ClientWebSocket.ClientWebSockets.TryAdd(context.Session.Id,webSocket);
+                        if (!result)
+                            throw new Exception("ClientWebSocket.ClientWebSockets.TryAdd?");
+
                         Console.WriteLine("WebSocket webSocket");
+                        var buffer = new byte[1024 * 4];
+                        WebSocketReceiveResult readResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                         //await Echo(context, webSocket);
                     }
                     else

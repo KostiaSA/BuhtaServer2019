@@ -7,6 +7,7 @@ namespace BuhtaServer
 {
     public class BuhtaConfig
     {
+        public string serverUniqueName;
         public List<Database> databases=new List<Database>();
 
         public Database GetDatabase(string dbName)
@@ -21,5 +22,6 @@ namespace BuhtaServer
         public string Dialect;
         public string Note;
         public string ConnectionString;
+        public string SqlName;
     }
 }
