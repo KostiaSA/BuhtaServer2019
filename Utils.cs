@@ -166,7 +166,7 @@ namespace BuhtaServer
                     conn.Open();
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = String.Join("\n",sqlBatch);
+                        cmd.CommandText = String.Join("\n", sqlBatch);
                         cmd.ExecuteNonQuery();
                         cmd.Dispose();
                     }
@@ -397,6 +397,23 @@ namespace BuhtaServer
                 result.Append(chars[b % (chars.Length)]);
             }
             return result.ToString();
+        }
+
+        public static string StringToSha256Base64(string str)
+        {
+            SHA256 sha256 = SHA256Managed.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+            byte[] hash = sha256.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
+        }
+
+        public static string CalcPasswordSha256Base64(string login, string password, bool isAdmin, string appSecuritySeed)
+        {
+            dynamic x = "v0N4VeAoDHLX4a6H";
+            SHA256 sha256 = SHA256Managed.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(login + "\t" + password + "\t" + appSecuritySeed + "\t" + isAdmin.ToString() + "\t" + x);
+            byte[] hash = sha256.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
     }
 

@@ -9,7 +9,7 @@ namespace BuhtaServer
     {
         public static string GetWebRoot()
         {
-            return @"c:\$\Buhta2019\BuhtaClient\wwwroot";
+            return @"c:\Buhta2019\BuhtaClient\wwwroot";
         }
 
         public static int GetPort()
@@ -21,5 +21,7 @@ namespace BuhtaServer
         {
             return "https://localhost:" + GetPort();
         }
+
+        public static Database AuthDb;
     }
 }

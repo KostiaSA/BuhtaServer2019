@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace BuhtaServer.Controllers
 {
@@ -31,12 +32,25 @@ namespace BuhtaServer.Controllers
                     return new { error = "на бухта-сервере нет настроек для базы данных 'auth'" };
                 }
 
-
                 var sessionId = (Guid)request["sessionId"];
                 var login = (String)request["login"];
                 var password = (String)request["password"];
 
-                if (login=="admin" && password=="admin")
+                var sql = "SELECT * FROM buhta_auth_User WHERE login=" + Utils.StringAsSql(login, App.AuthDb.Dialect);
+                var dataset = Utils.GetLoadedDataSet(App.AuthDb.Name, sql);
+                if (dataset.Tables[0].Rows.Count == 0)
+                {
+                    Thread.Sleep(1000);
+                    Console.WriteLine("неверный логин, "+login);
+                    return new { error = "неверный логин или пароль" };
+                }
+
+                var row = dataset.Tables[0].Rows[0];
+                var isAdmin = (bool)row["isAdmin"];
+                var passwordSha256base64 = (string)row["password"];
+
+
+                if (passwordSha256base64 == Utils.CalcPasswordSha256Base64(login, password, isAdmin, Program.BuhtaConfig.appSecuritySeed))
                 {
 
                     var newAuthToken = Utils.GetRandomString(32);
@@ -44,8 +58,10 @@ namespace BuhtaServer.Controllers
                     var userSession = new UserSession()
                     {
                         SessionId = (Guid)request["sessionId"],
+                        UserId=(Guid)row["userId"],
                         Login = login,
-                        AuthToken= newAuthToken,
+                        IsAdmin = (bool)row["isAdmin"],
+                        AuthToken = newAuthToken,
                         Ip = HttpContext.Connection.RemoteIpAddress.ToString()
                     };
 
@@ -54,14 +70,16 @@ namespace BuhtaServer.Controllers
                     var sqlBatch = new List<string>();
                     sqlBatch.Add("BEGIN TRAN");
 
-                    var sql = "DELETE FROM buhta_auth_Session WHERE sessionId="+Utils.GuidAsSql(sessionId, database.Dialect);
-                    sqlBatch.Add(sql);
+                    var sql1 = "DELETE FROM buhta_auth_Session WHERE sessionId=" + Utils.GuidAsSql(sessionId, database.Dialect);
+                    sqlBatch.Add(sql1);
 
-                    var sql2 = "INSERT INTO buhta_auth_Session(sessionId,clientIp,login,authToken,buhtaServerName,createTime,lastTime) VALUES(";
+                    var sql2 = "INSERT INTO buhta_auth_Session(sessionId,clientIp,login,authToken,userId,isAdmin,buhtaServerName,createTime,lastTime) VALUES(";
                     sql2 += " " + Utils.GuidAsSql(sessionId, database.Dialect);
                     sql2 += "," + Utils.StringAsSql(userSession.Ip, database.Dialect);
                     sql2 += "," + Utils.StringAsSql(userSession.Login, database.Dialect);
                     sql2 += "," + Utils.StringAsSql(userSession.AuthToken, database.Dialect);
+                    sql2 += "," + Utils.GuidAsSql(userSession.UserId, database.Dialect);
+                    sql2 += "," + Utils.BoolAsSql(userSession.IsAdmin, database.Dialect);
                     sql2 += "," + Utils.StringAsSql(Program.BuhtaConfig.serverUniqueName, database.Dialect);
                     sql2 += "," + Utils.DateTimeAsSql(DateTime.Now, database.Dialect);
                     sql2 += "," + Utils.DateTimeAsSql(DateTime.Now, database.Dialect);
@@ -70,12 +88,16 @@ namespace BuhtaServer.Controllers
 
                     sqlBatch.Add("COMMIT");
 
-                    Utils.ExecuteSql("auth",sqlBatch.ToArray());
+                    Utils.ExecuteSql("auth", sqlBatch.ToArray());
 
+                    Console.WriteLine("успешный логин: " + login);
+                    Thread.Sleep(200);
                     return new { authToken = newAuthToken };
                 }
                 else
                 {
+                    Console.WriteLine("неверный пароль для " + login);
+                    Thread.Sleep(1000);
                     return new { error = "неверный логин или пароль" };
                 }
                 //if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))

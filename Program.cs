@@ -27,6 +27,14 @@ namespace BuhtaServer
             BuildWebHost(args).Run();
         }
 
+        public static int startupErrorCount = 0;
+
+        public static void RegisterStartupError(string error)
+        {
+            startupErrorCount++;
+            throw new Exception(error);
+        }
+
         public static IWebHost BuildWebHost(string[] args)
         {
             var config = new ConfigurationBuilder()
@@ -44,6 +52,11 @@ namespace BuhtaServer
             var certificate = new X509Certificate2(certificateFileName, certificatePassword);
 
             BuhtaConfig = JsonConvert.DeserializeObject<BuhtaConfig>(File.ReadAllText("buhtaSettings.json"));
+            BuhtaConfig.CheckOnStartup();
+
+
+            // проверяем 
+
 
             return WebHost.CreateDefaultBuilder(args)
                 .UseKestrel(options =>

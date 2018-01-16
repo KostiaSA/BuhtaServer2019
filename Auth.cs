@@ -14,6 +14,7 @@ namespace BuhtaServer
         public Guid UserId;
         public string Login;
         public string Ip;
+        public bool IsAdmin;
 
     }
 

@@ -1,48 +1,49 @@
 ﻿{
-	"serverUniqueName": "BuhtaServer1",
-	"databases": [
-		{
-			"name": "auth",
-			"dialect": "mssql",
-			"note": "клиентские сессии, авторизация, журнал событий",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_auth;",
-			"sqlName": "Buhta2018_auth"
-		},
-		{
-			"name": "main",
-			"dialect": "mssql",
-			"note": "основная",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018;",
-			"sqlName": "Buhta2018"
-		},
-		{
-			"name": "testmssql",
-			"dialect": "mssql",
-			"note": "для тестов MSSQL",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;",
-			"sqlName": "Buhta2018_test"
-		},
-		{
-			"name": "testpostgres",
-			"dialect": "postgres",
-			"note": "для тестов Postgres",
-			"connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk2128506;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;",
-			"sqlName": "Buhta2018_test"
-		},
-		{
-			"name": "testmysql",
-			"dialect": "mysql",
-			"note": "для тестов MySQL",
+  "serverUniqueName": "BuhtaServer1",
+  "appSecuritySeed": "Wo5j9LIDMxOwW8mjD7HkVYsfKk7EwhhX",
+  "databases": [
+    {
+      "name": "auth",
+      "dialect": "mssql",
+      "note": "клиентские сессии, авторизация, журнал событий",
+      "connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_auth;",
+      "sqlName": "Buhta2018_auth"
+    },
+    {
+      "name": "main",
+      "dialect": "mssql",
+      "note": "основная",
+      "connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018;",
+      "sqlName": "Buhta2018"
+    },
+    {
+      "name": "testmssql",
+      "dialect": "mssql",
+      "note": "для тестов MSSQL",
+      "connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=Buhta2018_test;",
+      "sqlName": "Buhta2018_test"
+    },
+    {
+      "name": "testpostgres",
+      "dialect": "postgres",
+      "note": "для тестов Postgres",
+      "connectionString": "Client Encoding=utf8; User ID=postgres;Password=sonyk2128506;Host=192.168.0.70;Port=5432;Database=Buhta2018_test;Pooling=true;",
+      "sqlName": "Buhta2018_test"
+    },
+    {
+      "name": "testmysql",
+      "dialect": "mysql",
+      "note": "для тестов MySQL",
 
-			"connectionString": "User ID=root;Password=sonyk2128506;Host=192.168.0.70;Port=3306;Database=buhta2018_test;",
-			"sqlName": "Buhta2018_test"
-		},
-		{
-			"name": "mag3666",
-			"dialect": "mssql",
-			"note": "магазин техносилы",
-			"connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=MAG3666;",
-			"sqlName": "MAG3666"
-		}
-	]
+      "connectionString": "User ID=root;Password=sonyk2128506;Host=192.168.0.70;Port=3306;Database=buhta2018_test;",
+      "sqlName": "Buhta2018_test"
+    },
+    {
+      "name": "mag3666",
+      "dialect": "mssql",
+      "note": "магазин техносилы",
+      "connectionString": "Server=green\\sql2017;User Id=sa;Password=sonyk2128506;Database=MAG3666;",
+      "sqlName": "MAG3666"
+    }
+  ]
 }
