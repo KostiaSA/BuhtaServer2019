@@ -13,8 +13,8 @@ namespace BuhtaServer.Controllers
 
 
     [Produces("application/json")]
-    [Route("api/doStart")]
-    public class DoStartController : BaseAdminController
+    [Route("api/checkAuth")]
+    public class CheckAuthController : BaseAdminController
     {
         //class ResponseObject
         //{
@@ -29,10 +29,7 @@ namespace BuhtaServer.Controllers
             {
                 var request = Utils.parseXJSON(JObject.Parse(req.xjson.ToString()));
 
-                if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
-                    return NoAuthResponse();
-
-                return new {  };
+                return new { ok = AuthOk((Guid)request["sessionId"], (String)request["authToken"]) };
 
             }
             catch (Exception e)
