@@ -53,7 +53,7 @@ namespace BuhtaServer.Controllers
                 if (passwordSha256base64 == Utils.CalcPasswordSha256Base64(login, password, isAdmin, Program.BuhtaConfig.appSecuritySeed))
                 {
 
-                    var newAuthToken = Utils.GetRandomString(32);
+                    var newAuthToken = "at_"+Utils.GetRandomString(32-3);
 
                     var userSession = new UserSession()
                     {

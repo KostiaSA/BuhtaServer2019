@@ -37,7 +37,7 @@ namespace BuhtaServer
                 options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
                 options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             });
-            
+
 
             services.AddAntiforgery(
                     options =>
@@ -73,18 +73,39 @@ namespace BuhtaServer
 
             app.Use(async (context, next) =>
             {
-                if (context.Request.Path == "/ws")
+                if (context.Request.Path.ToString().StartsWith("/ws/"))
                 {
+                    string paramStr = context.Request.Path.ToString().Substring(4);
+                    string userSesionId = paramStr.Split("/")[0];
+                    string userWindowId = paramStr.Split("/")[1];
+
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        var result=ClientWebSocket.ClientWebSockets.TryAdd(context.Session.Id,webSocket);
-                        if (!result)
-                            throw new Exception("ClientWebSocket.ClientWebSockets.TryAdd?");
+
+                        UserSession UserSession;
+                        var sessionOk = Auth.UserSessions.TryGetValue(new Guid(userSesionId), out UserSession);
+
+                        if (!sessionOk)
+                            throw new Exception("нет авторизации");
+
+                        UserSession.webSockets.AddOrUpdate(userWindowId, webSocket, (key, oldValue) => webSocket);
+
+
+                        //var result = ClientWebSocket.ClientWebSockets.TryAdd(userSesionId, webSocket);
+                        //if (!result)
+                        //    throw new Exception("ClientWebSocket.ClientWebSockets.TryAdd?");
 
                         Console.WriteLine("WebSocket webSocket");
                         var buffer = new byte[1024 * 4];
                         WebSocketReceiveResult readResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        while (!readResult.CloseStatus.HasValue)
+                        {
+                            await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, readResult.Count), readResult.MessageType, readResult.EndOfMessage, CancellationToken.None);
+
+                            readResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        }
+                        //await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
                         //await Echo(context, webSocket);
                     }
                     else

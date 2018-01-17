@@ -75,6 +75,10 @@ namespace BuhtaServer.Controllers
                 if (!AuthOk((Guid)request["sessionId"], (String)request["authToken"]))
                     return NoAuthResponse();
 
+                var winId = (String)request["windowId"];
+                UserSession.SendMessage(winId,"ага 888");
+
+
                 var res = new ResponseObject();
                 res.name = "root";
                 loadFileNames(res, App.GetWebRoot() + "/" + request["path"]);
