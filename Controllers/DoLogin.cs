@@ -41,7 +41,7 @@ namespace BuhtaServer.Controllers
                 if (dataset.Tables[0].Rows.Count == 0)
                 {
                     Thread.Sleep(1000);
-                    Console.WriteLine("неверный логин, "+login);
+                    Console.WriteLine("неверный логин, " + login);
                     return new { error = "неверный логин или пароль" };
                 }
 
@@ -53,12 +53,12 @@ namespace BuhtaServer.Controllers
                 if (passwordSha256base64 == Utils.CalcPasswordSha256Base64(login, password, isAdmin, Program.BuhtaConfig.appSecuritySeed))
                 {
 
-                    var newAuthToken = "at_"+Utils.GetRandomString(32-3);
+                    var newAuthToken = "at_" + Utils.GetRandomString(32 - 3);
 
                     var userSession = new UserSession()
                     {
                         SessionId = (Guid)request["sessionId"],
-                        UserId=(Guid)row["userId"],
+                        UserId = (Guid)row["userId"],
                         Login = login,
                         IsAdmin = (bool)row["isAdmin"],
                         AuthToken = newAuthToken,
@@ -92,7 +92,7 @@ namespace BuhtaServer.Controllers
 
                     Console.WriteLine("успешный логин: " + login);
                     Thread.Sleep(200);
-                    return new { authToken = newAuthToken };
+                    return new { authToken = userSession.AuthToken, userId = userSession.UserId };
                 }
                 else
                 {
